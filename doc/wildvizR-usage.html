@@ -1,0 +1,495 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+
+<meta name="author" content="Sardys Avile-Martinez" />
+
+<meta name="date" content="2025-04-30" />
+
+<title>Visualizing and Summarizing Wildfire Damage in California</title>
+
+<script>// Pandoc 2.9 adds attributes on both header and div. We remove the former (to
+// be compatible with the behavior of Pandoc < 2.8).
+document.addEventListener('DOMContentLoaded', function(e) {
+  var hs = document.querySelectorAll("div.section[class*='level'] > :first-child");
+  var i, h, a;
+  for (i = 0; i < hs.length; i++) {
+    h = hs[i];
+    if (!/^h[1-6]$/i.test(h.tagName)) continue;  // it should be a header h1-h6
+    a = h.attributes;
+    while (a.length > 0) h.removeAttribute(a[0].name);
+  }
+});
+</script>
+
+<style type="text/css">
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+span.underline{text-decoration: underline;}
+div.column{display: inline-block; vertical-align: top; width: 50%;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+</style>
+
+
+
+<style type="text/css">
+code {
+white-space: pre;
+}
+.sourceCode {
+overflow: visible;
+}
+</style>
+<style type="text/css" data-origin="pandoc">
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { display: inline-block; text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+{ counter-reset: source-line 0; }
+pre.numberSource code > span
+{ position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+{ content: counter(source-line);
+position: relative; left: -1em; text-align: right; vertical-align: baseline;
+border: none; display: inline-block;
+-webkit-touch-callout: none; -webkit-user-select: none;
+-khtml-user-select: none; -moz-user-select: none;
+-ms-user-select: none; user-select: none;
+padding: 0 4px; width: 4em;
+color: #aaaaaa;
+}
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa; padding-left: 4px; }
+div.sourceCode
+{ }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } 
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } 
+code span.at { color: #7d9029; } 
+code span.bn { color: #40a070; } 
+code span.bu { color: #008000; } 
+code span.cf { color: #007020; font-weight: bold; } 
+code span.ch { color: #4070a0; } 
+code span.cn { color: #880000; } 
+code span.co { color: #60a0b0; font-style: italic; } 
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } 
+code span.do { color: #ba2121; font-style: italic; } 
+code span.dt { color: #902000; } 
+code span.dv { color: #40a070; } 
+code span.er { color: #ff0000; font-weight: bold; } 
+code span.ex { } 
+code span.fl { color: #40a070; } 
+code span.fu { color: #06287e; } 
+code span.im { color: #008000; font-weight: bold; } 
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } 
+code span.kw { color: #007020; font-weight: bold; } 
+code span.op { color: #666666; } 
+code span.ot { color: #007020; } 
+code span.pp { color: #bc7a00; } 
+code span.sc { color: #4070a0; } 
+code span.ss { color: #bb6688; } 
+code span.st { color: #4070a0; } 
+code span.va { color: #19177c; } 
+code span.vs { color: #4070a0; } 
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } 
+</style>
+<script>
+// apply pandoc div.sourceCode style to pre.sourceCode instead
+(function() {
+  var sheets = document.styleSheets;
+  for (var i = 0; i < sheets.length; i++) {
+    if (sheets[i].ownerNode.dataset["origin"] !== "pandoc") continue;
+    try { var rules = sheets[i].cssRules; } catch (e) { continue; }
+    var j = 0;
+    while (j < rules.length) {
+      var rule = rules[j];
+      // check if there is a div.sourceCode rule
+      if (rule.type !== rule.STYLE_RULE || rule.selectorText !== "div.sourceCode") {
+        j++;
+        continue;
+      }
+      var style = rule.style.cssText;
+      // check if color or background-color is set
+      if (rule.style.color === '' && rule.style.backgroundColor === '') {
+        j++;
+        continue;
+      }
+      // replace div.sourceCode by a pre.sourceCode rule
+      sheets[i].deleteRule(j);
+      sheets[i].insertRule('pre.sourceCode{' + style + '}', j);
+    }
+  }
+})();
+</script>
+
+
+
+
+<style type="text/css">body {
+background-color: #fff;
+margin: 1em auto;
+max-width: 700px;
+overflow: visible;
+padding-left: 2em;
+padding-right: 2em;
+font-family: "Open Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
+font-size: 14px;
+line-height: 1.35;
+}
+#TOC {
+clear: both;
+margin: 0 0 10px 10px;
+padding: 4px;
+width: 400px;
+border: 1px solid #CCCCCC;
+border-radius: 5px;
+background-color: #f6f6f6;
+font-size: 13px;
+line-height: 1.3;
+}
+#TOC .toctitle {
+font-weight: bold;
+font-size: 15px;
+margin-left: 5px;
+}
+#TOC ul {
+padding-left: 40px;
+margin-left: -1.5em;
+margin-top: 5px;
+margin-bottom: 5px;
+}
+#TOC ul ul {
+margin-left: -2em;
+}
+#TOC li {
+line-height: 16px;
+}
+table {
+margin: 1em auto;
+border-width: 1px;
+border-color: #DDDDDD;
+border-style: outset;
+border-collapse: collapse;
+}
+table th {
+border-width: 2px;
+padding: 5px;
+border-style: inset;
+}
+table td {
+border-width: 1px;
+border-style: inset;
+line-height: 18px;
+padding: 5px 5px;
+}
+table, table th, table td {
+border-left-style: none;
+border-right-style: none;
+}
+table thead, table tr.even {
+background-color: #f7f7f7;
+}
+p {
+margin: 0.5em 0;
+}
+blockquote {
+background-color: #f6f6f6;
+padding: 0.25em 0.75em;
+}
+hr {
+border-style: solid;
+border: none;
+border-top: 1px solid #777;
+margin: 28px 0;
+}
+dl {
+margin-left: 0;
+}
+dl dd {
+margin-bottom: 13px;
+margin-left: 13px;
+}
+dl dt {
+font-weight: bold;
+}
+ul {
+margin-top: 0;
+}
+ul li {
+list-style: circle outside;
+}
+ul ul {
+margin-bottom: 0;
+}
+pre, code {
+background-color: #f7f7f7;
+border-radius: 3px;
+color: #333;
+white-space: pre-wrap; 
+}
+pre {
+border-radius: 3px;
+margin: 5px 0px 10px 0px;
+padding: 10px;
+}
+pre:not([class]) {
+background-color: #f7f7f7;
+}
+code {
+font-family: Consolas, Monaco, 'Courier New', monospace;
+font-size: 85%;
+}
+p > code, li > code {
+padding: 2px 0px;
+}
+div.figure {
+text-align: center;
+}
+img {
+background-color: #FFFFFF;
+padding: 2px;
+border: 1px solid #DDDDDD;
+border-radius: 3px;
+border: 1px solid #CCCCCC;
+margin: 0 5px;
+}
+h1 {
+margin-top: 0;
+font-size: 35px;
+line-height: 40px;
+}
+h2 {
+border-bottom: 4px solid #f7f7f7;
+padding-top: 10px;
+padding-bottom: 2px;
+font-size: 145%;
+}
+h3 {
+border-bottom: 2px solid #f7f7f7;
+padding-top: 10px;
+font-size: 120%;
+}
+h4 {
+border-bottom: 1px solid #f7f7f7;
+margin-left: 8px;
+font-size: 105%;
+}
+h5, h6 {
+border-bottom: 1px solid #ccc;
+font-size: 105%;
+}
+a {
+color: #0033dd;
+text-decoration: none;
+}
+a:hover {
+color: #6666ff; }
+a:visited {
+color: #800080; }
+a:visited:hover {
+color: #BB00BB; }
+a[href^="http:"] {
+text-decoration: underline; }
+a[href^="https:"] {
+text-decoration: underline; }
+
+code > span.kw { color: #555; font-weight: bold; } 
+code > span.dt { color: #902000; } 
+code > span.dv { color: #40a070; } 
+code > span.bn { color: #d14; } 
+code > span.fl { color: #d14; } 
+code > span.ch { color: #d14; } 
+code > span.st { color: #d14; } 
+code > span.co { color: #888888; font-style: italic; } 
+code > span.ot { color: #007020; } 
+code > span.al { color: #ff0000; font-weight: bold; } 
+code > span.fu { color: #900; font-weight: bold; } 
+code > span.er { color: #a61717; background-color: #e3d2d2; } 
+</style>
+
+
+
+
+</head>
+
+<body>
+
+
+
+
+<h1 class="title toc-ignore">Visualizing and Summarizing Wildfire Damage
+in California</h1>
+<h4 class="author">Sardys Avile-Martinez</h4>
+<h4 class="date">2025-04-30</h4>
+
+
+
+<div id="introduction" class="section level1">
+<h1>Introduction</h1>
+<p>Welcome to wildvizR — a lightweight R package that empowers users to
+explore, summarize, and visualize wildfire data in California. This
+vignette demonstrates how to use the core functions of the package with
+a sample dataset included in the package folder.</p>
+<p>Let’s walk through it.</p>
+</div>
+<div id="load-the-data" class="section level1">
+<h1>Load the Data</h1>
+<p>The dataset is stored in inst/extdata and accessed with
+system.file():</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" tabindex="-1"></a></span>
+<span id="cb1-2"><a href="#cb1-2" tabindex="-1"></a>wildfire_data <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(<span class="fu">system.file</span>(<span class="st">&quot;extdata&quot;</span>, <span class="st">&quot;Cleaned_California_Wildfire_Damage.csv&quot;</span>, <span class="at">package =</span> <span class="st">&quot;wildvizR&quot;</span>))</span>
+<span id="cb1-3"><a href="#cb1-3" tabindex="-1"></a>wildfire_data <span class="ot">&lt;-</span> <span class="fu">clean_column_names</span>(wildfire_data)  </span>
+<span id="cb1-4"><a href="#cb1-4" tabindex="-1"></a><span class="fu">head</span>(wildfire_data)</span>
+<span id="cb1-5"><a href="#cb1-5" tabindex="-1"></a><span class="co">#&gt;   incident_id       date      location area_burned_acres homes_destroyed</span></span>
+<span id="cb1-6"><a href="#cb1-6" tabindex="-1"></a><span class="co">#&gt; 1     INC1000 2020-11-22 Sonoma County             14048             763</span></span>
+<span id="cb1-7"><a href="#cb1-7" tabindex="-1"></a><span class="co">#&gt; 2     INC1001 2021-09-23 Sonoma County             33667            1633</span></span>
+<span id="cb1-8"><a href="#cb1-8" tabindex="-1"></a><span class="co">#&gt; 3     INC1002 2022-02-10 Shasta County             26394             915</span></span>
+<span id="cb1-9"><a href="#cb1-9" tabindex="-1"></a><span class="co">#&gt; 4     INC1003 2021-05-17 Sonoma County             20004            1220</span></span>
+<span id="cb1-10"><a href="#cb1-10" tabindex="-1"></a><span class="co">#&gt; 5     INC1004 2021-09-22 Sonoma County             40320             794</span></span>
+<span id="cb1-11"><a href="#cb1-11" tabindex="-1"></a><span class="co">#&gt; 6     INC1005 2023-05-17  Butte County             48348              60</span></span>
+<span id="cb1-12"><a href="#cb1-12" tabindex="-1"></a><span class="co">#&gt;   businesses_destroyed vehicles_damaged injuries fatalities</span></span>
+<span id="cb1-13"><a href="#cb1-13" tabindex="-1"></a><span class="co">#&gt; 1                  474              235       70         19</span></span>
+<span id="cb1-14"><a href="#cb1-14" tabindex="-1"></a><span class="co">#&gt; 2                    4              263      100          2</span></span>
+<span id="cb1-15"><a href="#cb1-15" tabindex="-1"></a><span class="co">#&gt; 3                  291               31       50          6</span></span>
+<span id="cb1-16"><a href="#cb1-16" tabindex="-1"></a><span class="co">#&gt; 4                  128               34       28          0</span></span>
+<span id="cb1-17"><a href="#cb1-17" tabindex="-1"></a><span class="co">#&gt; 5                  469              147        0         15</span></span>
+<span id="cb1-18"><a href="#cb1-18" tabindex="-1"></a><span class="co">#&gt; 6                  205               21       58          2</span></span>
+<span id="cb1-19"><a href="#cb1-19" tabindex="-1"></a><span class="co">#&gt;   estimated_financial_loss_million          cause month</span></span>
+<span id="cb1-20"><a href="#cb1-20" tabindex="-1"></a><span class="co">#&gt; 1                          2270.57      Lightning    11</span></span>
+<span id="cb1-21"><a href="#cb1-21" tabindex="-1"></a><span class="co">#&gt; 2                          1381.14      Lightning     9</span></span>
+<span id="cb1-22"><a href="#cb1-22" tabindex="-1"></a><span class="co">#&gt; 3                          2421.96 Human Activity     2</span></span>
+<span id="cb1-23"><a href="#cb1-23" tabindex="-1"></a><span class="co">#&gt; 4                          3964.16        Unknown     5</span></span>
+<span id="cb1-24"><a href="#cb1-24" tabindex="-1"></a><span class="co">#&gt; 5                          1800.09        Unknown     9</span></span>
+<span id="cb1-25"><a href="#cb1-25" tabindex="-1"></a><span class="co">#&gt; 6                          4458.29 Human Activity     5</span></span></code></pre></div>
+</div>
+<div id="summarize-wildfire-damage-by-year" class="section level1">
+<h1>Summarize Wildfire Damage by Year</h1>
+<p>Use summarize_wildfire_damage() to get an annual summary of acres
+burned and total financial loss.</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" tabindex="-1"></a></span>
+<span id="cb2-2"><a href="#cb2-2" tabindex="-1"></a>summary <span class="ot">&lt;-</span> <span class="fu">summarize_wildfire_damage</span>(wildfire_data)</span>
+<span id="cb2-3"><a href="#cb2-3" tabindex="-1"></a><span class="fu">print</span>(summary)</span>
+<span id="cb2-4"><a href="#cb2-4" tabindex="-1"></a><span class="co">#&gt; # A tibble: 10 × 3</span></span>
+<span id="cb2-5"><a href="#cb2-5" tabindex="-1"></a><span class="co">#&gt;    year  total_acres total_loss_millions</span></span>
+<span id="cb2-6"><a href="#cb2-6" tabindex="-1"></a><span class="co">#&gt;    &lt;chr&gt;       &lt;int&gt;               &lt;dbl&gt;</span></span>
+<span id="cb2-7"><a href="#cb2-7" tabindex="-1"></a><span class="co">#&gt;  1 2014       292258              22034.</span></span>
+<span id="cb2-8"><a href="#cb2-8" tabindex="-1"></a><span class="co">#&gt;  2 2015       335017              20636.</span></span>
+<span id="cb2-9"><a href="#cb2-9" tabindex="-1"></a><span class="co">#&gt;  3 2016       221408              22327.</span></span>
+<span id="cb2-10"><a href="#cb2-10" tabindex="-1"></a><span class="co">#&gt;  4 2017        67059              13745.</span></span>
+<span id="cb2-11"><a href="#cb2-11" tabindex="-1"></a><span class="co">#&gt;  5 2018       286662              30937.</span></span>
+<span id="cb2-12"><a href="#cb2-12" tabindex="-1"></a><span class="co">#&gt;  6 2019       204166              23323 </span></span>
+<span id="cb2-13"><a href="#cb2-13" tabindex="-1"></a><span class="co">#&gt;  7 2020       210763              20401.</span></span>
+<span id="cb2-14"><a href="#cb2-14" tabindex="-1"></a><span class="co">#&gt;  8 2021       347909              37069.</span></span>
+<span id="cb2-15"><a href="#cb2-15" tabindex="-1"></a><span class="co">#&gt;  9 2022       295972              26704.</span></span>
+<span id="cb2-16"><a href="#cb2-16" tabindex="-1"></a><span class="co">#&gt; 10 2023       391932              22433.</span></span></code></pre></div>
+</div>
+<div id="identify-major-incidents" class="section level1">
+<h1>Identify Major Incidents</h1>
+<p>This function flags wildfires with losses greater than $50 million by
+default:</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" tabindex="-1"></a>major <span class="ot">&lt;-</span> <span class="fu">flag_major_incidents</span>(wildfire_data)</span>
+<span id="cb3-2"><a href="#cb3-2" tabindex="-1"></a><span class="fu">head</span>(major)</span>
+<span id="cb3-3"><a href="#cb3-3" tabindex="-1"></a><span class="co">#&gt;   incident_id       date      location area_burned_acres homes_destroyed</span></span>
+<span id="cb3-4"><a href="#cb3-4" tabindex="-1"></a><span class="co">#&gt; 1     INC1000 2020-11-22 Sonoma County             14048             763</span></span>
+<span id="cb3-5"><a href="#cb3-5" tabindex="-1"></a><span class="co">#&gt; 2     INC1001 2021-09-23 Sonoma County             33667            1633</span></span>
+<span id="cb3-6"><a href="#cb3-6" tabindex="-1"></a><span class="co">#&gt; 3     INC1002 2022-02-10 Shasta County             26394             915</span></span>
+<span id="cb3-7"><a href="#cb3-7" tabindex="-1"></a><span class="co">#&gt; 4     INC1003 2021-05-17 Sonoma County             20004            1220</span></span>
+<span id="cb3-8"><a href="#cb3-8" tabindex="-1"></a><span class="co">#&gt; 5     INC1004 2021-09-22 Sonoma County             40320             794</span></span>
+<span id="cb3-9"><a href="#cb3-9" tabindex="-1"></a><span class="co">#&gt; 6     INC1005 2023-05-17  Butte County             48348              60</span></span>
+<span id="cb3-10"><a href="#cb3-10" tabindex="-1"></a><span class="co">#&gt;   businesses_destroyed vehicles_damaged injuries fatalities</span></span>
+<span id="cb3-11"><a href="#cb3-11" tabindex="-1"></a><span class="co">#&gt; 1                  474              235       70         19</span></span>
+<span id="cb3-12"><a href="#cb3-12" tabindex="-1"></a><span class="co">#&gt; 2                    4              263      100          2</span></span>
+<span id="cb3-13"><a href="#cb3-13" tabindex="-1"></a><span class="co">#&gt; 3                  291               31       50          6</span></span>
+<span id="cb3-14"><a href="#cb3-14" tabindex="-1"></a><span class="co">#&gt; 4                  128               34       28          0</span></span>
+<span id="cb3-15"><a href="#cb3-15" tabindex="-1"></a><span class="co">#&gt; 5                  469              147        0         15</span></span>
+<span id="cb3-16"><a href="#cb3-16" tabindex="-1"></a><span class="co">#&gt; 6                  205               21       58          2</span></span>
+<span id="cb3-17"><a href="#cb3-17" tabindex="-1"></a><span class="co">#&gt;   estimated_financial_loss_million          cause month is_major</span></span>
+<span id="cb3-18"><a href="#cb3-18" tabindex="-1"></a><span class="co">#&gt; 1                          2270.57      Lightning    11     TRUE</span></span>
+<span id="cb3-19"><a href="#cb3-19" tabindex="-1"></a><span class="co">#&gt; 2                          1381.14      Lightning     9     TRUE</span></span>
+<span id="cb3-20"><a href="#cb3-20" tabindex="-1"></a><span class="co">#&gt; 3                          2421.96 Human Activity     2     TRUE</span></span>
+<span id="cb3-21"><a href="#cb3-21" tabindex="-1"></a><span class="co">#&gt; 4                          3964.16        Unknown     5     TRUE</span></span>
+<span id="cb3-22"><a href="#cb3-22" tabindex="-1"></a><span class="co">#&gt; 5                          1800.09        Unknown     9     TRUE</span></span>
+<span id="cb3-23"><a href="#cb3-23" tabindex="-1"></a><span class="co">#&gt; 6                          4458.29 Human Activity     5     TRUE</span></span></code></pre></div>
+</div>
+<div id="inspect-data-structure-and-missing-value" class="section level1">
+<h1>Inspect Data Structure and Missing Value</h1>
+<p>Use this utility to quickly review your dataset:</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" tabindex="-1"></a><span class="fu">inspect_data</span>(wildfire_data)</span>
+<span id="cb4-2"><a href="#cb4-2" tabindex="-1"></a><span class="co">#&gt; &#39;data.frame&#39;:    100 obs. of  12 variables:</span></span>
+<span id="cb4-3"><a href="#cb4-3" tabindex="-1"></a><span class="co">#&gt;  $ incident_id                     : chr  &quot;INC1000&quot; &quot;INC1001&quot; &quot;INC1002&quot; &quot;INC1003&quot; ...</span></span>
+<span id="cb4-4"><a href="#cb4-4" tabindex="-1"></a><span class="co">#&gt;  $ date                            : chr  &quot;2020-11-22&quot; &quot;2021-09-23&quot; &quot;2022-02-10&quot; &quot;2021-05-17&quot; ...</span></span>
+<span id="cb4-5"><a href="#cb4-5" tabindex="-1"></a><span class="co">#&gt;  $ location                        : chr  &quot;Sonoma County&quot; &quot;Sonoma County&quot; &quot;Shasta County&quot; &quot;Sonoma County&quot; ...</span></span>
+<span id="cb4-6"><a href="#cb4-6" tabindex="-1"></a><span class="co">#&gt;  $ area_burned_acres               : int  14048 33667 26394 20004 40320 48348 16038 24519 20418 21351 ...</span></span>
+<span id="cb4-7"><a href="#cb4-7" tabindex="-1"></a><span class="co">#&gt;  $ homes_destroyed                 : int  763 1633 915 1220 794 60 1404 121 299 275 ...</span></span>
+<span id="cb4-8"><a href="#cb4-8" tabindex="-1"></a><span class="co">#&gt;  $ businesses_destroyed            : int  474 4 291 128 469 205 137 28 264 196 ...</span></span>
+<span id="cb4-9"><a href="#cb4-9" tabindex="-1"></a><span class="co">#&gt;  $ vehicles_damaged                : int  235 263 31 34 147 21 64 125 208 153 ...</span></span>
+<span id="cb4-10"><a href="#cb4-10" tabindex="-1"></a><span class="co">#&gt;  $ injuries                        : int  70 100 50 28 0 58 13 0 33 41 ...</span></span>
+<span id="cb4-11"><a href="#cb4-11" tabindex="-1"></a><span class="co">#&gt;  $ fatalities                      : int  19 2 6 0 15 2 11 5 4 2 ...</span></span>
+<span id="cb4-12"><a href="#cb4-12" tabindex="-1"></a><span class="co">#&gt;  $ estimated_financial_loss_million: num  2271 1381 2422 3964 1800 ...</span></span>
+<span id="cb4-13"><a href="#cb4-13" tabindex="-1"></a><span class="co">#&gt;  $ cause                           : chr  &quot;Lightning&quot; &quot;Lightning&quot; &quot;Human Activity&quot; &quot;Unknown&quot; ...</span></span>
+<span id="cb4-14"><a href="#cb4-14" tabindex="-1"></a><span class="co">#&gt;  $ month                           : int  11 9 2 5 9 5 4 8 12 12 ...</span></span>
+<span id="cb4-15"><a href="#cb4-15" tabindex="-1"></a><span class="co">#&gt; $structure</span></span>
+<span id="cb4-16"><a href="#cb4-16" tabindex="-1"></a><span class="co">#&gt; NULL</span></span>
+<span id="cb4-17"><a href="#cb4-17" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb4-18"><a href="#cb4-18" tabindex="-1"></a><span class="co">#&gt; $missing_summary</span></span>
+<span id="cb4-19"><a href="#cb4-19" tabindex="-1"></a><span class="co">#&gt;                      incident_id                             date </span></span>
+<span id="cb4-20"><a href="#cb4-20" tabindex="-1"></a><span class="co">#&gt;                                0                                0 </span></span>
+<span id="cb4-21"><a href="#cb4-21" tabindex="-1"></a><span class="co">#&gt;                         location                area_burned_acres </span></span>
+<span id="cb4-22"><a href="#cb4-22" tabindex="-1"></a><span class="co">#&gt;                                0                                0 </span></span>
+<span id="cb4-23"><a href="#cb4-23" tabindex="-1"></a><span class="co">#&gt;                  homes_destroyed             businesses_destroyed </span></span>
+<span id="cb4-24"><a href="#cb4-24" tabindex="-1"></a><span class="co">#&gt;                                0                                0 </span></span>
+<span id="cb4-25"><a href="#cb4-25" tabindex="-1"></a><span class="co">#&gt;                 vehicles_damaged                         injuries </span></span>
+<span id="cb4-26"><a href="#cb4-26" tabindex="-1"></a><span class="co">#&gt;                                0                                0 </span></span>
+<span id="cb4-27"><a href="#cb4-27" tabindex="-1"></a><span class="co">#&gt;                       fatalities estimated_financial_loss_million </span></span>
+<span id="cb4-28"><a href="#cb4-28" tabindex="-1"></a><span class="co">#&gt;                                0                                0 </span></span>
+<span id="cb4-29"><a href="#cb4-29" tabindex="-1"></a><span class="co">#&gt;                            cause                            month </span></span>
+<span id="cb4-30"><a href="#cb4-30" tabindex="-1"></a><span class="co">#&gt;                                0                                0</span></span></code></pre></div>
+</div>
+<div id="plot-county-level-loss" class="section level1">
+<h1>Plot County-Level Loss</h1>
+<p>Generate a choropleth map showing estimated financial loss by
+county:</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" tabindex="-1"></a><span class="fu">plot_county_loss_map</span>(wildfire_data)</span>
+<span id="cb5-2"><a href="#cb5-2" tabindex="-1"></a><span class="co">#&gt; Retrieving data for the year 2022</span></span>
+<span id="cb5-3"><a href="#cb5-3" tabindex="-1"></a><span class="co">#&gt;   |                                                                              |                                                                      |   0%  |                                                                              |                                                                      |   1%  |                                                                              |=                                                                     |   1%  |                                                                              |=                                                                     |   2%  |                                                                              |==                                                                    |   2%  |                                                                              |==                                                                    |   3%  |                                                                              |==                                                                    |   4%  |                                                                              |===                                                                   |   4%  |                                                                              |===                                                                   |   5%  |                                                                              |====                                                                  |   5%  |                                                                              |====                                                                  |   6%  |                                                                              |=====                                                                 |   7%  |                                                                              |=====                                                                 |   8%  |                                                                              |======                                                                |   8%  |                                                                              |======                                                                |   9%  |                                                                              |=======                                                               |  10%  |                                                                              |========                                                              |  11%  |                                                                              |========                                                              |  12%  |                                                                              |=========                                                             |  12%  |                                                                              |=========                                                             |  13%  |                                                                              |==========                                                            |  14%  |                                                                              |==========                                                            |  15%  |                                                                              |===========                                                           |  16%  |                                                                              |============                                                          |  17%  |                                                                              |============                                                          |  18%  |                                                                              |=============                                                         |  19%  |                                                                              |==============                                                        |  20%  |                                                                              |===============                                                       |  21%  |                                                                              |===============                                                       |  22%  |                                                                              |================                                                      |  22%  |                                                                              |================                                                      |  23%  |                                                                              |=================                                                     |  24%  |                                                                              |==================                                                    |  25%  |                                                                              |==================                                                    |  26%  |                                                                              |===================                                                   |  27%  |                                                                              |====================                                                  |  28%  |                                                                              |=====================                                                 |  29%  |                                                                              |=====================                                                 |  31%  |                                                                              |======================                                                |  32%  |                                                                              |=======================                                               |  33%  |                                                                              |========================                                              |  34%  |                                                                              |========================                                              |  35%  |                                                                              |=========================                                             |  36%  |                                                                              |==========================                                            |  37%  |                                                                              |===========================                                           |  38%  |                                                                              |============================                                          |  39%  |                                                                              |============================                                          |  40%  |                                                                              |=============================                                         |  41%  |                                                                              |==============================                                        |  42%  |                                                                              |==============================                                        |  43%  |                                                                              |==============================                                        |  44%  |                                                                              |===============================                                       |  45%  |                                                                              |================================                                      |  46%  |                                                                              |=================================                                     |  48%  |                                                                              |==================================                                    |  48%  |                                                                              |==================================                                    |  49%  |                                                                              |===================================                                   |  50%  |                                                                              |====================================                                  |  51%  |                                                                              |=====================================                                 |  53%  |                                                                              |=====================================                                 |  54%  |                                                                              |======================================                                |  55%  |                                                                              |=======================================                               |  56%  |                                                                              |========================================                              |  57%  |                                                                              |=========================================                             |  58%  |                                                                              |=========================================                             |  59%  |                                                                              |==========================================                            |  60%  |                                                                              |===========================================                           |  62%  |                                                                              |============================================                          |  62%  |                                                                              |============================================                          |  63%  |                                                                              |=============================================                         |  64%  |                                                                              |==============================================                        |  65%  |                                                                              |===============================================                       |  67%  |                                                                              |===============================================                       |  68%  |                                                                              |================================================                      |  69%  |                                                                              |=================================================                     |  70%  |                                                                              |==================================================                    |  71%  |                                                                              |==================================================                    |  72%  |                                                                              |===================================================                   |  73%  |                                                                              |====================================================                  |  74%  |                                                                              |=====================================================                 |  75%  |                                                                              |=====================================================                 |  76%  |                                                                              |======================================================                |  78%  |                                                                              |=======================================================               |  79%  |                                                                              |========================================================              |  80%  |                                                                              |=========================================================             |  81%  |                                                                              |=========================================================             |  82%  |                                                                              |==========================================================            |  83%  |                                                                              |===========================================================           |  84%  |                                                                              |============================================================          |  85%  |                                                                              |=============================================================         |  87%  |                                                                              |=============================================================         |  88%  |                                                                              |==============================================================        |  89%  |                                                                              |===============================================================       |  90%  |                                                                              |================================================================      |  91%  |                                                                              |================================================================      |  92%  |                                                                              |=================================================================     |  93%  |                                                                              |==================================================================    |  94%  |                                                                              |===================================================================   |  95%  |                                                                              |===================================================================   |  96%  |                                                                              |====================================================================  |  97%  |                                                                              |===================================================================== |  98%  |                                                                              |===================================================================== |  99%  |                                                                              |======================================================================| 100%</span></span></code></pre></div>
+<p><img role="img" src="data:image/png;base64,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" /><!-- --></p>
+</div>
+
+
+
+<!-- code folding -->
+
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>

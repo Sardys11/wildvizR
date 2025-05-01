@@ -1,0 +1,74 @@
+---
+title: "Visualizing and Summarizing Wildfire Damage in California"
+author: "Sardys Avile-Martinez"
+date: "2025-04-30"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Visualizing and Summarizing Wildfire Damage in California}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+library(wildvizR)
+library(dplyr)
+library(ggplot2)
+library(knitr)
+```
+
+#  Introduction
+Welcome to wildvizR — a lightweight R package that empowers users to explore, summarize, and visualize wildfire data in California. This vignette demonstrates how to use the core functions of the package with a sample dataset included in the package folder.
+
+Let’s walk through it.
+
+#  Load the Data
+The dataset is stored in inst/extdata and accessed with system.file():
+
+```{r read-data, echo=TRUE}
+
+wildfire_data <- read.csv(system.file("extdata", "Cleaned_California_Wildfire_Damage.csv", package = "wildvizR"))
+wildfire_data <- clean_column_names(wildfire_data)  
+head(wildfire_data)
+
+```
+
+# Summarize Wildfire Damage by Year
+Use summarize_wildfire_damage() to get an annual summary of acres burned and total financial loss.
+```{r}
+
+summary <- summarize_wildfire_damage(wildfire_data)
+print(summary)
+
+```
+
+# Identify Major Incidents
+This function flags wildfires with losses greater than $50 million by default:
+```{r}
+major <- flag_major_incidents(wildfire_data)
+head(major)
+
+```
+
+# Inspect Data Structure and Missing Value
+Use this utility to quickly review your dataset:
+```{r}
+inspect_data(wildfire_data)
+
+```
+
+# Plot County-Level Loss
+Generate a choropleth map showing estimated financial loss by county:
+```{r}
+plot_county_loss_map(wildfire_data)
+
+```
+
+
+
+
+
+
+
